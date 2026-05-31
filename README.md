@@ -8,7 +8,8 @@ A Python web scraping tool that collects photo gallery listings from Telugu ente
 
 - Scrapes gallery titles and URLs from two Telugu websites
 - Groups galleries by person/name
-- Formats URLs ready for a download tool
+- Formats URLs ready for downloading
+- Downloads images directly into `downloads/123telugu/<gallery-slug>/`
 - Tracks run history and resumes from where it left off
 
 ---
@@ -30,6 +31,7 @@ base.py                        # shared HTTP session, retry, rate limiting
 telugu123/
   scraper.py                   # 123telugu scraper + checkpoint logic
   formatter.py                 # groups and formats scraped URLs
+  downloader.py                # downloads images from 123telugu-format.txt
 telugucinema/
   scraper.py                   # telugucinema scraper → CSV
 output/
@@ -38,6 +40,12 @@ output/
     123telugu-format.txt       # formatted --url lines (cleared each format)
     123telugu-checkpoint.txt   # last scraped URL + resume state
     123telugu-history.txt      # log of every run (never cleared)
+downloads/
+  123telugu/
+    <gallery-slug>/            # one folder per album (e.g. Samyuktha-031/)
+      image1.jpg
+      image2.jpg
+      ...
 ```
 
 ---
@@ -74,12 +82,13 @@ source .venv/bin/activate
 ## Quick Start
 
 ```bash
-# Daily incremental scrape (picks up new galleries since last run)
-python main.py telugu123
-
-# Full scrape of all 199 pages + format
+# Full scrape → format → download (first time or monthly refresh)
 python main.py telugu123 fullscrape
-python main.py telugu123 fullformat
+python main.py telugu123 download
+
+# Daily: pick up new galleries and download them
+python main.py telugu123
+python main.py telugu123 download
 ```
 
 ---
@@ -99,6 +108,7 @@ python main.py telugu123 fullformat
 
 - **Checkpoint resume** — incremental scrape skips already-seen galleries
 - **Full scrape resume** — if interrupted at page 87, next run continues from page 88
+- **Download resume** — already-downloaded images are skipped automatically
 - **Run history** — every run is logged with timestamp, pages, and gallery count
 - **Auto retry** — retries failed pages with exponential backoff (429, 500, 502, 503, 504)
 - **Rate limiting** — 1 second delay between requests

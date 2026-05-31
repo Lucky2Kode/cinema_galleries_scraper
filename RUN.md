@@ -44,8 +44,9 @@ python main.py
   1. Scrape URLs    (selected pages → 123telugu-galleries.txt)
   2. Full scrape    (pages 1–199   → 123telugu-galleries.txt)
   3. Format URLs    (123telugu-galleries.txt → 123telugu-format.txt)
+  4. Download       (123telugu-format.txt → downloads/123telugu/)
 ==================================================
-Choose an option (1-3):
+Choose an option (1-4):
 ```
 
 ---
@@ -167,14 +168,51 @@ python main.py telugu123 fullformat
 
 ---
 
+### Download images
+
+Reads `123telugu-format.txt` and downloads every gallery to `downloads/123telugu/<gallery-slug>/`.
+Already-downloaded images are skipped — safe to interrupt and resume.
+
+```bash
+python main.py telugu123 download
+```
+
+```
+[download] 20 person(s), 20 total album(s) to download.
+
+[download] ══ Anu-Emmanuel (1 album(s)) ══
+
+[download] Gallery : Anu-Emmanuel31
+[download] URL     : https://gallery.123telugu.com/content/slideshows/2026/5/Anu-Emmanuel31/imgpages/
+[download] 25 image pages found.
+  [1/25] ✓ image1.jpg
+  [2/25] ✓ image2.jpg
+  ...
+[download] Done: 25/25 images → downloads/123telugu/Anu-Emmanuel31
+
+[download] All done. 487 total images downloaded.
+```
+
+**Folder structure:**
+```
+downloads/
+  123telugu/
+    Anu-Emmanuel31/
+    Rukshar-Dhillon-31/
+    Samyuktha-031/
+    ...
+```
+
+---
+
 ### Full workflow (first time or monthly refresh)
 
 ```bash
-# Step 1 — scrape all pages
+# Step 1 — scrape all pages + format
 python main.py telugu123 fullscrape
 
-# Step 2 — format and group results
-python main.py telugu123 fullformat
+# Step 2 — download images
+python main.py telugu123 download
 ```
 
 ### Daily workflow (pick up new galleries)
@@ -183,8 +221,8 @@ python main.py telugu123 fullformat
 # Picks up only new galleries since last run
 python main.py telugu123
 
-# Then format
-python main.py telugu123 fullformat
+# Download the new ones (existing images are skipped)
+python main.py telugu123 download
 ```
 
 ---

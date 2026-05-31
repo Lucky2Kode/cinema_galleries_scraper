@@ -4,8 +4,9 @@ __pycache__/
 *.pyo
 .venv/
 
-# macOS metadata inside output
+# macOS metadata inside output / downloads
 output/**/.DS_Store
+downloads/
 
 # IDE
 .idea/

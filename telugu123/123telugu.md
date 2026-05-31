@@ -41,6 +41,7 @@ source .venv/bin/activate
 | `python main.py telugu123 fullscrape` | Scrape all 199 pages + auto format |
 | `python main.py telugu123 fullscrape 1 50` | Scrape pages 1–50 + auto format |
 | `python main.py telugu123 fullformat` | Format only (no scrape) |
+| `python main.py telugu123 download` | Download images from 123telugu-format.txt |
 | `python main.py telugu123 1` | Scrape a single page |
 | `python main.py telugu123 1 5 10` | Scrape specific pages |
 | `python main.py telugu123 1-10` | Scrape a range of pages |
@@ -246,6 +247,56 @@ Checkpoint set : https://gallery.123telugu.com/.../LatestGallery/...
 
 ---
 
+## 8. Download Images
+
+Downloads every gallery listed in `123telugu-format.txt` into `downloads/123telugu/<gallery-slug>/`.
+Run `fullformat` first if you haven't already.
+
+```bash
+python main.py telugu123 download
+```
+
+**Sample output:**
+```
+[download] 20 person(s), 20 total album(s) to download.
+
+[download] ══ Anu-Emmanuel (1 album(s)) ══
+
+[download] Gallery : Anu-Emmanuel31
+[download] URL     : https://gallery.123telugu.com/content/slideshows/2026/5/Anu-Emmanuel31/imgpages/
+[download] 25 image pages found.
+  [1/25] ✓ image1.jpg
+  [2/25] ✓ image2.jpg
+  ...
+  [25/25] ✓ image25.jpg
+[download] Done: 25/25 images → downloads/123telugu/Anu-Emmanuel31
+
+[download] ══ Rukshar-Dhillon (1 album(s)) ══
+...
+
+[download] All done. 487 total images downloaded.
+```
+
+**Folder structure created:**
+```
+downloads/
+  123telugu/
+    Anu-Emmanuel31/
+      image1.jpg
+      image2.jpg
+      ...
+    Rukshar-Dhillon-31/
+      image1.jpg
+      ...
+    Samyuktha-031/
+      image1.jpg
+      ...
+```
+
+Already-downloaded images are skipped on re-run — safe to interrupt and resume.
+
+---
+
 ## Reset and Scrape Everything Fresh
 
 ```bash
@@ -259,21 +310,25 @@ python main.py telugu123 fullscrape
 
 ### First time setup
 ```bash
-python main.py telugu123 fullscrape
+python main.py telugu123 fullscrape   # scrape all 199 pages + format
+python main.py telugu123 download     # download all images
 ```
 
 ### Daily update
 ```bash
-python main.py telugu123
+python main.py telugu123              # scrape + format new galleries
+python main.py telugu123 download     # download only the new ones (skips existing)
 ```
 
 ### Missed a few days (new galleries may be on pages 2–3)
 ```bash
 python main.py telugu123 1-3
 python main.py telugu123 fullformat
+python main.py telugu123 download
 ```
 
 ### Monthly full refresh
 ```bash
 python main.py telugu123 fullscrape
+python main.py telugu123 download
 ```

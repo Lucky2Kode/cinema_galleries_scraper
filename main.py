@@ -9,12 +9,14 @@ Usage:
     python main.py telugu123 fullscrape      # scrape all pages 1-199
     python main.py telugu123 fullscrape 1 50 # scrape pages 1-50
     python main.py telugu123 fullformat      # format 123telugu-galleries.txt → 123telugu-format.txt
+    python main.py telugu123 download        # download images from 123telugu-format.txt
     python main.py telugucinema              # run telugucinema scraper
 """
 
 import sys
 from telugu123.scraper import Telugu123Scraper
 from telugu123.formatter import format_full_urls
+from telugu123.downloader import Telugu123Downloader
 from telugucinema.scraper import TeluguCinemaScraper
 
 
@@ -52,6 +54,11 @@ def run_telugu123_full(start: int = 1, end: int = 199):
     format_full_urls()
 
 
+def run_telugu123_download():
+    downloader = Telugu123Downloader()
+    downloader.download_all()
+
+
 def run_telugucinema():
     scraper = TeluguCinemaScraper()
     scraper.scrape()
@@ -64,9 +71,10 @@ def show_menu():
     print("  1. Scrape URLs    (selected pages → 123telugu-galleries.txt)")
     print("  2. Full scrape    (pages 1–199   → 123telugu-galleries.txt)")
     print("  3. Format URLs    (123telugu-galleries.txt → 123telugu-format.txt)")
+    print("  4. Download       (123telugu-format.txt → downloads/123telugu/)")
     print("=" * 50)
 
-    choice = input("Choose an option (1-3): ").strip()
+    choice = input("Choose an option (1-4): ").strip()
 
     if choice == "1":
         print("\nEnter page numbers to scrape.")
@@ -87,8 +95,12 @@ def show_menu():
         print()
         format_full_urls()
 
+    elif choice == "4":
+        print()
+        run_telugu123_download()
+
     else:
-        print(f"Invalid choice '{choice}'. Please enter 1, 2, or 3.")
+        print(f"Invalid choice '{choice}'. Please enter 1, 2, 3, or 4.")
         sys.exit(1)
 
 
@@ -104,6 +116,8 @@ if __name__ == "__main__":
             start = int(args[2]) if len(args) > 2 else 1
             end = int(args[3]) if len(args) > 3 else 199
             run_telugu123_full(start=start, end=end)
+        elif len(args) > 1 and args[1] == "download":
+            run_telugu123_download()
         else:
             pages = parse_pages(args[1:])
             run_telugu123(pages)
