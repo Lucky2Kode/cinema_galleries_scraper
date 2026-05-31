@@ -73,6 +73,11 @@ def _format(source: str, dest: str) -> None:
     print(f"[formatter] {len(seen_urls)} unique URLs grouped into {len(groups)} names.")
     print(f"[formatter] Output written to {dest}")
 
+    # Clear galleries.txt — all URLs are now in format.txt
+    with open(source, "w", encoding="utf-8") as f:
+        pass
+    print(f"[formatter] Cleared {len(seen_urls)} formatted URLs from {os.path.basename(source)}")
+
 
 def format_full_urls() -> None:
     _format(source=FULL_OUTPUT_FILE, dest=FULL_FORMATTED_FILE)

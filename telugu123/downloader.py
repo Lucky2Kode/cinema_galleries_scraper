@@ -167,8 +167,12 @@ class Telugu123Downloader(BaseScraper):
     # Public API
     # ------------------------------------------------------------------
 
-    def download_gallery(self, gallery_url: str) -> int:
-        """Download all images from one gallery URL. Returns count saved."""
+    def download_gallery(self, gallery_url: str) -> tuple[int, int]:
+        """Download all images from one gallery URL.
+
+        Returns (downloaded, total). A gallery is considered complete when
+        downloaded == total and total > 0. On crawl failure total is 0.
+        """
         slug = gallery_slug(gallery_url)
         dest_dir = os.path.join(self.download_dir, slug)
 
@@ -179,11 +183,11 @@ class Telugu123Downloader(BaseScraper):
             image_pages = self._crawl_gallery(gallery_url)
         except Exception as e:
             print(f"[download] Failed to crawl: {e}")
-            return 0
+            return 0, 0
 
         if not image_pages:
             print("[download] No image pages found.")
-            return 0
+            return 0, 0
 
         total = len(image_pages)
         print(f"[download] {total} image pages found.")
@@ -201,10 +205,36 @@ class Telugu123Downloader(BaseScraper):
                 print(f"  [{idx}/{total}] Error: {e}")
 
         print(f"[download] Done: {downloaded}/{total} images → {dest_dir}")
-        return downloaded
+        return downloaded, total
+
+    def _rewrite_format_file(self, galleries: list[tuple[str, list[str]]]) -> None:
+        """Overwrite format.txt with only the given galleries.
+
+        Truncates the file when galleries is empty (all downloads succeeded).
+        """
+        with open(self.format_file, "w", encoding="utf-8") as f:
+            for name, urls in galleries:
+                f.write(f"### {name} ({len(urls)} album(s))\n\n")
+                for i, url in enumerate(urls):
+                    continuation = "" if i == len(urls) - 1 else " \\"
+                    f.write(f'--url "{url}"{continuation}\n')
+                f.write("\n")
+
+        if galleries:
+            kept = sum(len(u) for _, u in galleries)
+            print(
+                f"[download] {kept} gallery/ies kept in "
+                f"{os.path.basename(self.format_file)} — download incomplete."
+            )
+        else:
+            print(f"[download] All galleries downloaded. {os.path.basename(self.format_file)} cleared.")
 
     def download_all(self) -> None:
-        """Download every gallery listed in the format file."""
+        """Download every gallery listed in the format file.
+
+        After completion, rewrites format.txt keeping only galleries whose
+        downloads were incomplete (partial failures or crawl errors).
+        """
         if not os.path.exists(self.format_file):
             print(f"[download] Format file not found: {self.format_file}")
             print("[download] Run: python main.py telugu123 fullformat")
@@ -222,9 +252,26 @@ class Telugu123Downloader(BaseScraper):
         )
 
         total_images = 0
+        failed: list[tuple[str, list[str]]] = []
+
         for name, urls in galleries:
             print(f"\n[download] ══ {name} ({len(urls)} album(s)) ══")
+            failed_urls: list[str] = []
             for url in urls:
-                total_images += self.download_gallery(url)
+                downloaded, total = self.download_gallery(url)
+                total_images += downloaded
+                if downloaded < total or total == 0:
+                    failed_urls.append(url)
+            if failed_urls:
+                failed.append((name, failed_urls))
 
-        print(f"\n[download] All done. {total_images} total images downloaded.")
+        self._rewrite_format_file(failed)
+
+        failed_count = sum(len(u) for _, u in failed)
+        if failed_count:
+            print(
+                f"\n[download] Done. {total_images} images downloaded. "
+                f"{failed_count} gallery/ies had errors — kept in format file for retry."
+            )
+        else:
+            print(f"\n[download] All done. {total_images} total images downloaded.")
