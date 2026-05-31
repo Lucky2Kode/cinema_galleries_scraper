@@ -313,15 +313,19 @@ class IdlebrainDownloader(BaseScraper):
             for url in failed_urls:
                 f.write(url + "\n")
 
-        # Append successful slugs to history with a run timestamp
+        # Prepend successful slugs to history with a run timestamp
         if done_urls:
             from datetime import datetime
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            with open(history_file, "a", encoding="utf-8") as f:
-                f.write(f"=== {timestamp} ===\n")
-                for url in done_urls:
-                    f.write(gallery_slug(url) + "\n")
-                f.write("\n")
+            existing = ""
+            if os.path.exists(history_file):
+                with open(history_file, "r", encoding="utf-8") as f:
+                    existing = f.read()
+            new_block = f"=== {timestamp} ===\n"
+            new_block += "".join(gallery_slug(u) + "\n" for u in done_urls)
+            new_block += "\n"
+            with open(history_file, "w", encoding="utf-8") as f:
+                f.write(new_block + existing)
 
         if failed_urls:
             print(
