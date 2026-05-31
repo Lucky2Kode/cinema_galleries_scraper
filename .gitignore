@@ -4,12 +4,8 @@ __pycache__/
 *.pyo
 .venv/
 
-# Output data files (generated, not source)
-output/telugu123/123telugu-galleries.txt
-output/telugu123/123telugu-format.txt
-output/telugu123/123telugu-checkpoint.txt
-output/telugu123/123telugu-history.txt
-output/telugucinema/galleries.csv
+# macOS metadata inside output
+output/**/.DS_Store
 
 # IDE
 .idea/
