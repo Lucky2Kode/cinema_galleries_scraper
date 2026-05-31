@@ -22,6 +22,8 @@ from urllib.parse import unquote, urljoin
 from base import BaseScraper
 
 FORMAT_FILE = os.path.join("output", "idlebrain", "idlebrain-format.txt")
+DAILY_FILE = os.path.join("output", "idlebrain", "idlebrain-daily.txt")
+DAILY_HISTORY_FILE = os.path.join("output", "idlebrain", "idlebrain-daily-history.txt")
 DOWNLOAD_DIR = os.path.join("downloads", "idlebrain")
 
 _LOGO_KEYWORDS = ("th_", "thumb", "logo", "white", "/ads/", "banner")
@@ -265,3 +267,65 @@ class IdlebrainDownloader(BaseScraper):
             )
         else:
             print(f"\n[download] All done. {total_images} total images downloaded.")
+
+    def download_daily(
+        self,
+        daily_file: str = DAILY_FILE,
+        history_file: str = DAILY_HISTORY_FILE,
+    ) -> None:
+        """Download galleries listed in idlebrain-daily.txt (one URL per line).
+
+        After each run:
+          - Successfully completed URLs are removed from daily.txt and
+            appended to idlebrain-daily-history.txt.
+          - Failed or partial URLs remain in daily.txt for retry.
+        """
+        if not os.path.exists(daily_file):
+            print(f"[download] Daily file not found: {daily_file}")
+            return
+
+        urls = [
+            line.strip()
+            for line in open(daily_file, encoding="utf-8")
+            if line.strip().startswith("http")
+        ]
+
+        if not urls:
+            print("[download] No URLs found in daily file.")
+            return
+
+        print(f"[download] {len(urls)} URL(s) in {os.path.basename(daily_file)}")
+
+        total_images = 0
+        failed_urls: list[str] = []
+        done_urls: list[str] = []
+
+        for url in urls:
+            downloaded, total = self.download_gallery(url)
+            total_images += downloaded
+            if downloaded == total and total > 0:
+                done_urls.append(url)
+            else:
+                failed_urls.append(url)
+
+        # Rewrite daily.txt with only failed URLs
+        with open(daily_file, "w", encoding="utf-8") as f:
+            for url in failed_urls:
+                f.write(url + "\n")
+
+        # Append successful URLs to history
+        if done_urls:
+            with open(history_file, "a", encoding="utf-8") as f:
+                for url in done_urls:
+                    f.write(url + "\n")
+
+        if failed_urls:
+            print(
+                f"\n[download] Done. {total_images} images downloaded. "
+                f"{len(failed_urls)} URL(s) kept in daily file for retry."
+            )
+        else:
+            print(
+                f"\n[download] All done. {total_images} images downloaded. "
+                f"Daily file cleared ({len(done_urls)} URL(s) moved to history)."
+            )

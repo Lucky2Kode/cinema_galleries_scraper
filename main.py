@@ -13,6 +13,7 @@ Usage:
     python main.py idlebrain                 # scrape idlebrain heroines (new galleries only)
     python main.py idlebrain format          # format idlebrain-galleries.txt → idlebrain-format.txt
     python main.py idlebrain download        # download images from idlebrain-format.txt
+    python main.py idlebrain daily           # download images from idlebrain-daily.txt
     python main.py telugucinema              # run telugucinema scraper
 """
 
@@ -81,6 +82,11 @@ def run_idlebrain_download():
     downloader.download_all()
 
 
+def run_idlebrain_daily():
+    downloader = IdlebrainDownloader()
+    downloader.download_daily()
+
+
 def run_telugucinema():
     scraper = TeluguCinemaScraper()
     scraper.scrape()
@@ -99,9 +105,10 @@ def show_menu():
     print("  5. Scrape heroines (new galleries → idlebrain-galleries.txt + format)")
     print("  6. Format URLs     (idlebrain-galleries.txt → idlebrain-format.txt)")
     print("  7. Download        (idlebrain-format.txt → downloads/idlebrain/)")
+    print("  8. Daily download  (idlebrain-daily.txt   → downloads/idlebrain/)")
     print("=" * 50)
 
-    choice = input("Choose an option (1-7): ").strip()
+    choice = input("Choose an option (1-8): ").strip()
 
     if choice == "1":
         print("\nEnter page numbers to scrape.")
@@ -138,8 +145,12 @@ def show_menu():
         print()
         run_idlebrain_download()
 
+    elif choice == "8":
+        print()
+        run_idlebrain_daily()
+
     else:
-        print(f"Invalid choice '{choice}'. Please enter 1–7.")
+        print(f"Invalid choice '{choice}'. Please enter 1–8.")
         sys.exit(1)
 
 
@@ -165,6 +176,8 @@ if __name__ == "__main__":
             run_idlebrain_format()
         elif len(args) > 1 and args[1] == "download":
             run_idlebrain_download()
+        elif len(args) > 1 and args[1] == "daily":
+            run_idlebrain_daily()
         else:
             run_idlebrain()
     elif args[0] == "telugucinema":
