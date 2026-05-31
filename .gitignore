@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+
+# Output data files (generated, not source)
+output/telugu123/123telugu-galleries.txt
+output/telugu123/123telugu-format.txt
+output/telugu123/123telugu-checkpoint.txt
+output/telugu123/123telugu-history.txt
+output/telugucinema/galleries.csv
+
+# IDE
+.idea/
+.vscode/
+.cursor/
+
+# macOS
+.DS_Store
