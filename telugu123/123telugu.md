@@ -6,8 +6,28 @@ Scrapes photo gallery listings from [123telugu.com/category/gallery](https://www
 
 ## Setup
 
+**Prerequisites:** Python 3.9+
+
+### First time (do once)
+
 ```bash
-cd WebScrapping
+# 1. Navigate to the project directory
+cd cinema_galleries_scraper
+
+# 2. Create a virtual environment
+python3 -m venv .venv
+
+# 3. Activate it
+source .venv/bin/activate
+
+# 4. Install dependencies
+pip install requests beautifulsoup4 lxml
+```
+
+### Every session (after setup is done)
+
+```bash
+cd cinema_galleries_scraper
 source .venv/bin/activate
 ```
 

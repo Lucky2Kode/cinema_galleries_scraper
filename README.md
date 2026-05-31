@@ -44,15 +44,29 @@ output/
 
 ## Setup
 
-```bash
-# Clone or download the project, then:
-cd WebScrapping
+**Prerequisites:** Python 3.9+
 
-# Activate the virtual environment
+### First time (do once)
+
+```bash
+# 1. Navigate to the project directory
+cd cinema_galleries_scraper
+
+# 2. Create a virtual environment
+python3 -m venv .venv
+
+# 3. Activate it
 source .venv/bin/activate
 
-# Dependencies are already installed in .venv
-# If starting fresh: pip install requests beautifulsoup4 lxml
+# 4. Install dependencies
+pip install requests beautifulsoup4 lxml
+```
+
+### Every session (after setup is done)
+
+```bash
+cd cinema_galleries_scraper
+source .venv/bin/activate
 ```
 
 ---
@@ -60,8 +74,6 @@ source .venv/bin/activate
 ## Quick Start
 
 ```bash
-source .venv/bin/activate
-
 # Daily incremental scrape (picks up new galleries since last run)
 python main.py telugu123
 
