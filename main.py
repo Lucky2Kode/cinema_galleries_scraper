@@ -10,6 +10,9 @@ Usage:
     python main.py telugu123 fullscrape 1 50 # scrape pages 1-50
     python main.py telugu123 fullformat      # format 123telugu-galleries.txt → 123telugu-format.txt
     python main.py telugu123 download        # download images from 123telugu-format.txt
+    python main.py idlebrain                 # scrape idlebrain heroines (new galleries only)
+    python main.py idlebrain format          # format idlebrain-galleries.txt → idlebrain-format.txt
+    python main.py idlebrain download        # download images from idlebrain-format.txt
     python main.py telugucinema              # run telugucinema scraper
 """
 
@@ -17,6 +20,9 @@ import sys
 from telugu123.scraper import Telugu123Scraper
 from telugu123.formatter import format_full_urls
 from telugu123.downloader import Telugu123Downloader
+from idlebrain.scraper import IdlebrainScraper
+from idlebrain.formatter import format_idlebrain_urls
+from idlebrain.downloader import IdlebrainDownloader
 from telugucinema.scraper import TeluguCinemaScraper
 
 
@@ -59,6 +65,22 @@ def run_telugu123_download():
     downloader.download_all()
 
 
+def run_idlebrain():
+    scraper = IdlebrainScraper()
+    scraper.scrape()
+    print()
+    format_idlebrain_urls()
+
+
+def run_idlebrain_format():
+    format_idlebrain_urls()
+
+
+def run_idlebrain_download():
+    downloader = IdlebrainDownloader()
+    downloader.download_all()
+
+
 def run_telugucinema():
     scraper = TeluguCinemaScraper()
     scraper.scrape()
@@ -68,13 +90,18 @@ def show_menu():
     print("\n" + "=" * 50)
     print("  Telugu Gallery Scraper")
     print("=" * 50)
+    print("  --- 123Telugu ---")
     print("  1. Scrape URLs    (selected pages → 123telugu-galleries.txt)")
     print("  2. Full scrape    (pages 1–199   → 123telugu-galleries.txt)")
     print("  3. Format URLs    (123telugu-galleries.txt → 123telugu-format.txt)")
     print("  4. Download       (123telugu-format.txt → downloads/123telugu/)")
+    print("  --- Idlebrain ---")
+    print("  5. Scrape heroines (new galleries → idlebrain-galleries.txt + format)")
+    print("  6. Format URLs     (idlebrain-galleries.txt → idlebrain-format.txt)")
+    print("  7. Download        (idlebrain-format.txt → downloads/idlebrain/)")
     print("=" * 50)
 
-    choice = input("Choose an option (1-4): ").strip()
+    choice = input("Choose an option (1-7): ").strip()
 
     if choice == "1":
         print("\nEnter page numbers to scrape.")
@@ -99,8 +126,20 @@ def show_menu():
         print()
         run_telugu123_download()
 
+    elif choice == "5":
+        print()
+        run_idlebrain()
+
+    elif choice == "6":
+        print()
+        run_idlebrain_format()
+
+    elif choice == "7":
+        print()
+        run_idlebrain_download()
+
     else:
-        print(f"Invalid choice '{choice}'. Please enter 1, 2, 3, or 4.")
+        print(f"Invalid choice '{choice}'. Please enter 1–7.")
         sys.exit(1)
 
 
@@ -121,6 +160,13 @@ if __name__ == "__main__":
         else:
             pages = parse_pages(args[1:])
             run_telugu123(pages)
+    elif args[0] == "idlebrain":
+        if len(args) > 1 and args[1] == "format":
+            run_idlebrain_format()
+        elif len(args) > 1 and args[1] == "download":
+            run_idlebrain_download()
+        else:
+            run_idlebrain()
     elif args[0] == "telugucinema":
         run_telugucinema()
     else:
